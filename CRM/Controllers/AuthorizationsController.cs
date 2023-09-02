@@ -82,7 +82,8 @@ namespace CRM.Controllers
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
             if (!ModelState.IsValid) { return BadRequest(); }
-            AppUser user = await _userManager.Users.FirstOrDefaultAsync(x => x.Email == forgotPasswordDto.Email && x.IsDeleted == false);
+            AppUser user = await _userManager.Users
+                .FirstOrDefaultAsync(x => x.Email == forgotPasswordDto.Email && x.IsDeleted == false);
             if (user == null) { return NotFound("Email is incorrect"); }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);

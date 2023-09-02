@@ -1,14 +1,9 @@
-﻿using CRM.DAL;
-using CRM.DTO;
+﻿using CRM.DTO;
 using CRM.Enums;
 using CRM.Models;
 using CRM.Repositories.Interfaces;
 using CRM.Services.Interface;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using CRM.Exceptions;
 
 namespace CRM.Services
@@ -16,19 +11,18 @@ namespace CRM.Services
     public class AccountsService : IAccountsService
     {
         private readonly IAccountsRepository _accountsRepository;
-        private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AccountsService(IAccountsRepository accountsRepository, UserManager<AppUser> userManager,IMapper mapper) 
+        public AccountsService(IAccountsRepository accountsRepository, 
+            IMapper mapper) 
         {
             _accountsRepository = accountsRepository;
-            _userManager = userManager;
             _mapper = mapper;
         }
 
         public async Task BlockAccount(int id)
         {
-            var entity = await _accountsRepository.GetAsync(x => x.Id == id && !x.IsDeleted && !x.IsBlocked);
+            var entity = await _accountsRepository.GetAccountIsdeletedFalseAsync(id);
             if (entity == null)
                 throw new ItemNotFoundException("item not found");
             entity.IsBlocked = true;
@@ -38,7 +32,7 @@ namespace CRM.Services
 
         public async Task ChangeCurrency(int id, byte currency)
         {
-            var entity = await _accountsRepository.GetAsync(x => x.Id == id && !x.IsDeleted && !x.IsBlocked);
+            var entity = await _accountsRepository.GetAccountIsdeletedFalseAsync(id);
             if (entity == null)
                 throw new ItemNotFoundException("item not found");
             if (Enum.IsDefined(typeof(Currency), currency))
@@ -60,7 +54,7 @@ namespace CRM.Services
 
         public async Task Delete(int id)
         {
-            var entity = await _accountsRepository.GetAsync(x => x.Id == id && !x.IsDeleted && !x.IsBlocked);
+            var entity = await _accountsRepository.GetAccountIsdeletedFalseAsync(id);
             if (entity == null)
                 throw new ItemNotFoundException("item not found");
             entity.IsDeleted = true;
@@ -95,7 +89,7 @@ namespace CRM.Services
 
         public async Task UpdateAsync(int id, AccountDto postDto)
         {
-            var entity = await _accountsRepository.GetAsync(x => x.Id == id && !x.IsDeleted && !x.IsBlocked);
+            var entity = await _accountsRepository.GetAccountIsdeletedFalseAsync(id);
             if (entity == null)
                 throw new ItemNotFoundException("item not found");
             if (await _accountsRepository.IsExistAsync(x => x.Name == postDto.Name && x.Currency == postDto.Currency && !x.IsDeleted))
@@ -110,8 +104,6 @@ namespace CRM.Services
 
         }
 
-
-      
       
 
         //public GetAccountDto GetAccount(int id)
@@ -130,8 +122,6 @@ namespace CRM.Services
         //        return _mapper.Map<List<GetAccountDto>>(result);
         //    else return null;
         //}
-
-   
 
         //public bool ChangeCurrency(int id, byte currency)
         //{

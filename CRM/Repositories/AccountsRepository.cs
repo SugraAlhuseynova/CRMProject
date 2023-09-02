@@ -15,7 +15,9 @@ namespace CRM.Repositories
         public AccountsRepository(AppDbContext context) : base(context)
         {
         }
-
-       
+        public async Task<Account> GetAccountIsdeletedFalseAsync(int id)
+        {
+            return await GetAsync(x => x.Id == id && !x.IsDeleted && !x.IsBlocked);
+        }
     }
 }

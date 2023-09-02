@@ -53,7 +53,19 @@ namespace CRM.Test.Controllers
         public async void Register_ReturnsIdentityResultErrors_OkReceived()
         {
             //Arrange
-            var userRegistrationDto = A.Fake<UserRegistrationDto>();
+            #region Arrange
+            UserRegistrationDto userRegistrationDto = new UserRegistrationDto
+            {
+                UserName = "Username",
+                LastName = "Alhuseynova",
+                Name = "Sugra",
+                Email = "email@gmail.com",
+                Password = "String123",
+                ConfirmPassword = "String123",
+                Address = "address",
+                BirthDate = DateTime.Parse("12.12.2002"),
+            };
+
             A.CallTo(() => _userService.CheckUsernameExistence(userRegistrationDto.UserName)).Returns(false);
             AppUser user = A.Fake<AppUser>();
             A.CallTo(() => _mapper.Map<AppUser>(userRegistrationDto)).Returns(user);
@@ -61,6 +73,8 @@ namespace CRM.Test.Controllers
             var identityResult = A.Fake<IdentityResult>();
             A.CallTo(() => _userManager.CreateAsync(user, userRegistrationDto.Password)).Returns(IdentityResult.Failed());
 
+            #endregion
+            
             //Act
             var actual = await _authorizationsController.Register(userRegistrationDto) as ObjectResult;
             var actualValue = actual.Value as IEnumerable<IdentityError>;

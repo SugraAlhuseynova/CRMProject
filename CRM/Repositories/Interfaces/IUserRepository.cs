@@ -6,5 +6,6 @@ namespace CRM.Repositories.Interfaces
     {
         AppUser DeleteUser(string username);
         AppUser RestoreUser(string username);
+        int Commit();
     }
 }

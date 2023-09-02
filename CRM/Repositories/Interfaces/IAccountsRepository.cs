@@ -6,6 +6,6 @@ namespace CRM.Repositories.Interfaces
 {
     public interface IAccountsRepository : IRepository<Account>
     {
-
+        Task<Account> GetAccountIsdeletedFalseAsync(int id);
     }
 }

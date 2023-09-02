@@ -11,13 +11,11 @@ namespace CRM.Services
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IUserRepository _userRepository;
-        private readonly AppDbContext _context;
 
-        public UserService(UserManager<AppUser> userManager, IUserRepository userRepository, AppDbContext context)
+        public UserService(UserManager<AppUser> userManager, IUserRepository userRepository)
         {
             _userManager = userManager;
             _userRepository = userRepository;
-            _context = context;
         }
         public bool DeleteUser(string username)
         {
@@ -25,14 +23,11 @@ namespace CRM.Services
             if (user == null)
                 return false;
             user.IsDeleted = true;
-            if (user.Accounts != null)
-            {
-                foreach (var item in user.Accounts)
+                if (user.Accounts != null)
                 {
-                    item.IsDeleted = true;
+                  user.Accounts.ForEach(a => a.IsDeleted = true);
                 }
-            }
-            _context.SaveChanges();
+            _userRepository.Commit();
             return true;
         }
 
@@ -44,14 +39,12 @@ namespace CRM.Services
             user.IsDeleted = false;
             if (user.Accounts != null)
             {
-                foreach (var item in user.Accounts)
-                {
-                    item.IsDeleted = false;
-                }
+                user.Accounts.ForEach(a => a.IsDeleted = false);
             }
-            _context.SaveChanges();
+            _userRepository.Commit();
             return true;
         }
+        #region Some Methods for Authorization Controller
         public bool CheckUsernameExistence(string username)
         {
             return _userManager.Users.Any(x => x.UserName == username);
@@ -61,5 +54,6 @@ namespace CRM.Services
         {
             return await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username && x.IsDeleted == false);
         }
+        #endregion
     }
 }
