@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CRM.DTO;
+using CRM.Enums;
 using CRM.Exceptions;
 using CRM.Models;
 using CRM.Repositories.Interfaces;
@@ -35,8 +37,6 @@ namespace CRM.Test.Services
             Func<Task> action = async () => await _sut.BlockAccount(id);
             await action.Should().ThrowAsync<ItemNotFoundException>().WithMessage(expected);
         }
-        [Fact]
-
 
 
 

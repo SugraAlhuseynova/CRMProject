@@ -38,17 +38,19 @@ namespace CRM.Services
             if (Enum.IsDefined(typeof(Currency), currency))
             {
                 entity.Currency = (Currency)currency;
-                await _accountsRepository.CommitAsync();   
+                await _accountsRepository.CommitAsync();
             }
+            else
+                throw new ItemNotFoundException("Currency not found");
         }
 
         public async Task CreateAsync(AccountDto postDto)
         {
-            var entity = await _accountsRepository.GetAsync(x=>x.Name == postDto.Name && x.Currency == postDto.Currency && !x.IsDeleted);
+            Account entity = await _accountsRepository.GetAsync(x=>x.Name == postDto.Name && x.Currency == postDto.Currency && !x.IsDeleted);
             if (entity != null)
                 throw new RecordDuplicateException("Item already exist");
-            Account account = _mapper.Map<Account>(postDto);
-            await _accountsRepository.CreateAsync(account);
+            entity = _mapper.Map<Account>(postDto);
+            await _accountsRepository.CreateAsync(entity);
             await _accountsRepository.CommitAsync();    
         }
 
